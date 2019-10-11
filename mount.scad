@@ -28,6 +28,7 @@ LED_LENGTH = 5;
 
 //Options
 MOUNT_OPEN_END = true;
+MOUNT_OPEN_RIGHT = false;
 LED_ENABLED = true;
 
 module plugSlot() {
@@ -70,10 +71,11 @@ module base() {
        
         
         diff_length = (!MOUNT_OPEN_END && LENGTH_PERCENTAGE == 1.00) ? 2 * THICKNESS : 0;
+        diff_width = (MOUNT_OPEN_RIGHT) ? THICKNESS : 2 * THICKNESS;        
  
         echo(diff_length);
         translate([THICKNESS, THICKNESS, 0]) {
-            cube([MOUNT_WIDTH - 2 * THICKNESS,
+            cube([MOUNT_WIDTH - diff_width,
                   MOUNT_LENGTH - diff_length,
                   MOUNT_HEIGHT - THICKNESS]);
         } 

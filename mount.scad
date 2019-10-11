@@ -25,6 +25,9 @@ LED_MIDDLE_X = 11 + TOLERANCE / 2;
 LED_MIDDLE_Y = 10 + TOLERANCE / 2;
 LED_WIDTH = 3;
 LED_LENGTH = 5;
+
+//Options
+MOUNT_OPEN_END = true;
 LED_ENABLED = true;
 
 module plugSlot() {
@@ -64,9 +67,14 @@ module base() {
         cube([MOUNT_WIDTH,
               MOUNT_LENGTH,
               MOUNT_HEIGHT]);
+       
+        
+        diff_length = (!MOUNT_OPEN_END && LENGTH_PERCENTAGE == 1.00) ? 2 * THICKNESS : 0;
+ 
+        echo(diff_length);
         translate([THICKNESS, THICKNESS, 0]) {
             cube([MOUNT_WIDTH - 2 * THICKNESS,
-                  MOUNT_LENGTH - THICKNESS,
+                  MOUNT_LENGTH - diff_length,
                   MOUNT_HEIGHT - THICKNESS]);
         } 
     }
@@ -74,8 +82,14 @@ module base() {
 
 difference() {
     base();
-    plugSlot();
     
+    plugSlot();
+    if (LENGTH_PERCENTAGE == 1.0) {
+        translate([0, MOUNT_LENGTH - THICKNESS, 0]) {
+            plugSlot();
+        }
+    }
+
     if (LED_ENABLED) {
         ledHole();
     } 

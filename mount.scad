@@ -78,9 +78,9 @@ module ledHole() {
 }
 
 module screwTap() {
-    screw_middle_x = TAP_WIDTH * 2 / 3;
+    screw_middle_x = TAP_WIDTH * 0.6;
     screw_middle_y = TAP_LENGTH / 2;
-    thickness = 2 * THICKNESS;
+    thickness = 2.5 * THICKNESS;
 
     translate([THICKNESS,
                TAP_ANGLE_LENGTH,
@@ -104,10 +104,16 @@ module screwTap() {
                        0]) {
                 cylinder(d = TAP_SCREW_DIAM, h = thickness);
                 translate([0, 0, thickness - TAP_PYRA_DEPTH]) {
-
+                    cylinder(d1 = TAP_SCREW_DIAM, d2 = TAP_SCREW_TOP_DIAM, h = TAP_PYRA_DEPTH);
                 }
             }
         }
+    }
+}
+
+module taps() {
+    if (TAP_LEFT) {
+
     }
 }
 
@@ -145,4 +151,4 @@ difference() {
     } 
 }
 
-!screwTap();
+screwTap();

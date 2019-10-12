@@ -13,7 +13,7 @@ GC30E_HEIGHT = 36;
 GC30E_PLUG_DIAM = 14 + TOLERANCE;
 
 //Mount
-THICKNESS = 3;
+THICKNESS = 2;
 LENGTH_PERCENTAGE = 0.70;
 MOUNT_LENGTH = GC30E_LENGTH * LENGTH_PERCENTAGE + THICKNESS + TOLERANCE;
 MOUNT_WIDTH = GC30E_WIDTH + 2 * THICKNESS + TOLERANCE;
@@ -26,10 +26,25 @@ LED_MIDDLE_Y = 10 + TOLERANCE / 2;
 LED_WIDTH = 3;
 LED_LENGTH = 5;
 
+//Screw-Tap
+TAP_WIDTH = 20;
+TAP_LENGTH = 12;
+TAP_TOLERANCE = 1;
+TAP_SCREW_DIAM = 4 + TAP_TOLERANCE;
+TAP_SCREW_TOP_DIAM = 9 + TAP_TOLERANCE;
+TAP_PYRA_DEPTH = 4;
+TAP_ANGLE = 30;
+TAP_ANGLE_LENGTH = TAP_LENGTH * tan(TAP_ANGLE);
+TAP_LENGTH_W_ANGLE = TAP_LENGTH + 2 * TAP_ANGLE_LENGTH;
+
 //Options
 MOUNT_OPEN_END = true;
 MOUNT_OPEN_RIGHT = false;
 LED_ENABLED = true;
+TAP_LEFT = true;
+TAP_RIGHT = false;
+TAP_START = true;
+TAP_END = false;
 
 module plugSlot() {
     translate([MOUNT_WIDTH / 2 - GC30E_PLUG_DIAM / 2, 0, 0]) {
@@ -62,6 +77,39 @@ module ledHole() {
     }
 }
 
+module screwTap() {
+    screw_middle_x = TAP_WIDTH * 2 / 3;
+    screw_middle_y = TAP_LENGTH / 2;
+    thickness = 2 * THICKNESS;
+
+    translate([THICKNESS,
+               TAP_ANGLE_LENGTH,
+               0]) { 
+        difference() {
+            hull() {
+                cube([TAP_WIDTH,
+                      TAP_LENGTH,
+                      thickness]);
+                translate([-THICKNESS, 
+                           -TAP_ANGLE_LENGTH,
+                           0]) {
+                    cube([THICKNESS,
+                          TAP_LENGTH_W_ANGLE,
+                          thickness]);
+                }
+            }
+            
+            translate([screw_middle_x,
+                       screw_middle_y,
+                       0]) {
+                cylinder(d = TAP_SCREW_DIAM, h = thickness);
+                translate([0, 0, thickness - TAP_PYRA_DEPTH]) {
+
+                }
+            }
+        }
+    }
+}
 
 module base() {
     difference() {
@@ -96,3 +144,5 @@ difference() {
         ledHole();
     } 
 }
+
+!screwTap();

@@ -14,7 +14,7 @@ GC30E_PLUG_DIAM = 14 + TOLERANCE;
 
 //Mount
 THICKNESS = 2;
-LENGTH_PERCENTAGE = 0.70;
+LENGTH_PERCENTAGE = 1.0;
 MOUNT_LENGTH = GC30E_LENGTH * LENGTH_PERCENTAGE + THICKNESS + TOLERANCE;
 MOUNT_WIDTH = GC30E_WIDTH + 2 * THICKNESS + TOLERANCE;
 MOUNT_HEIGHT = GC30E_HEIGHT + THICKNESS + TOLERANCE;
@@ -38,13 +38,13 @@ TAP_ANGLE_LENGTH = TAP_LENGTH * tan(TAP_ANGLE);
 TAP_LENGTH_W_ANGLE = TAP_LENGTH + 2 * TAP_ANGLE_LENGTH;
 
 //Options
-MOUNT_OPEN_END = true;
+MOUNT_OPEN_END = false;
 MOUNT_OPEN_RIGHT = false;
 LED_ENABLED = true;
 TAP_LEFT = true;
-TAP_RIGHT = false;
+TAP_RIGHT = true;
 TAP_START = true;
-TAP_END = false;
+TAP_END = true;
 
 module plugSlot() {
     translate([MOUNT_WIDTH / 2 - GC30E_PLUG_DIAM / 2, 0, 0]) {
@@ -82,9 +82,7 @@ module screwTap() {
     screw_middle_y = TAP_LENGTH / 2;
     thickness = 2.5 * THICKNESS;
 
-    translate([THICKNESS,
-               TAP_ANGLE_LENGTH,
-               0]) { 
+    translate([0, TAP_ANGLE_LENGTH, 0]) { 
         difference() {
             hull() {
                 cube([TAP_WIDTH,
@@ -99,6 +97,14 @@ module screwTap() {
                 }
             }
             
+            translate([-THICKNESS, 
+                       -TAP_ANGLE_LENGTH,
+                       0]) {
+                cube([THICKNESS,
+                      TAP_LENGTH_W_ANGLE,
+                      thickness]);
+            }
+            
             translate([screw_middle_x,
                        screw_middle_y,
                        0]) {
@@ -111,9 +117,47 @@ module screwTap() {
     }
 }
 
+module tapStart() { 
+    rotate([0, 0, 270]) {
+        screwTap();
+
+        translate([0, MOUNT_WIDTH - TAP_LENGTH_W_ANGLE, 0]) {
+            screwTap();
+        }
+    }
+}
+
 module taps() {
     if (TAP_LEFT) {
+        mirror(v = [-1, 0, 0]) {
+            screwTap();
 
+            translate([0, MOUNT_LENGTH - TAP_LENGTH_W_ANGLE, 0]) {
+                screwTap();
+            } 
+        }
+    }
+
+    if (TAP_START) {
+        tapStart();
+    }
+
+    if (TAP_RIGHT && !MOUNT_OPEN_RIGHT) {
+       translate([MOUNT_WIDTH, 0, 0]) {
+            screwTap();
+            
+            translate([0, MOUNT_LENGTH - TAP_LENGTH_W_ANGLE, 0]) {
+                screwTap();
+            }
+        } 
+    }
+
+    if (TAP_END && !MOUNT_OPEN_END && LENGTH_PERCENTAGE == 1.0) {
+        translate([0, MOUNT_LENGTH, 0]) {
+            mirror([0, -1, 0]) {
+                tapStart(); 
+            }
+        }
     }
 }
 
@@ -127,7 +171,6 @@ module base() {
         diff_length = (!MOUNT_OPEN_END && LENGTH_PERCENTAGE == 1.00) ? 2 * THICKNESS : 0;
         diff_width = (MOUNT_OPEN_RIGHT) ? THICKNESS : 2 * THICKNESS;        
  
-        echo(diff_length);
         translate([THICKNESS, THICKNESS, 0]) {
             cube([MOUNT_WIDTH - diff_width,
                   MOUNT_LENGTH - diff_length,
@@ -151,4 +194,4 @@ difference() {
     } 
 }
 
-screwTap();
+taps();
